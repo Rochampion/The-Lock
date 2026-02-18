@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
         setContent {    //UI:
             BlockAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ListApps(modifier = Modifier.padding(innerPadding))
+                    ListApps(modifier = Modifier.padding(innerPadding)) //Method Calling the list of all apps
                 }
             }
         }
@@ -59,32 +59,33 @@ fun GreetingPreview() {
 }
 
 @Composable
-fun ListApps(modifier: Modifier = Modifier){
+fun ListApps(modifier: Modifier = Modifier){ //List all apps that are executable
     val context = LocalContext.current
-    var appNames by remember { mutableStateOf<List<String>>(emptyList()) }
+    var appNames by remember { mutableStateOf<List<String>>(emptyList()) } //initiating both context and the appnames list
 
     LaunchedEffect(Unit) { //Runs once!
-        val pm = context.packageManager
-        val intent = Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_LAUNCHER) } //las apps que podemos ver
+        val paquete = context.packageManager
+        val intent = Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_LAUNCHER) } //Intent: What apps CAN we see? (Launchables)
 
-        appNames = pm.queryIntentActivities(intent, 0) //coger las appnames
-            .map { name -> name.loadLabel(pm).toString() }
+        appNames = paquete.queryIntentActivities(intent, 0) //get the appnames through a stream
+            .map { name -> name.loadLabel(paquete).toString() }
             .distinct()
-            .sortedBy { name -> name.lowercase() }
+            .sortedBy { name -> name.lowercase() } //sort the apps by their names
     }
 
     LazyColumn(modifier = modifier.padding(16.dp)){ //intro
         item{
-            Text("Installed apps: ${appNames.size} :) ")
+            Text("Installed apps: ${appNames.size} :) ") //Not true, but rather installes apps that are launchable, does its job I guess
             Text("These are your apps:")
         }
-        if(appNames.isEmpty()){ //esperar mientras las apps cargan
+        if(appNames.isEmpty()){ //Wait while appnames might still be loading
             item{
                 Text("Loading...")
             }
 
         }
         else{
+            //Display the app names
             items(appNames) { name ->
                 Text(name)
             }
