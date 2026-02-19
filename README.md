@@ -2,7 +2,7 @@ Dumb app which should in the future help with blocking apps like youtube, twitte
 The app should have the following features for each app: 
 1) Choose a time-slot for usage
 2) Choose a max amount of minutes/ hours per timeslot
-3) Choose option: After x minutes, the app blocks for 2 hours
+3) Choose option: After x minutes, the app blocks for x hours
 4) Choosing depending off it being a day of the week
 
 The whole motivation off the app is me learning Kotlin and me not trusting the other apps that do this.
