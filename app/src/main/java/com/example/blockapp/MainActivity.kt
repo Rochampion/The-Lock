@@ -9,6 +9,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,16 +27,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.blockapp.ui.theme.BlockAppTheme
+import kotlinx.coroutines.selects.select
+import kotlin.comparisons.compareBy
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState) //Android Setup
         enableEdgeToEdge() //Fullscreen
         setContent {    //UI:
+            var selectedApp by remember {mutableStateOf<String?>(null)}
             BlockAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ListApps(modifier = Modifier.padding(innerPadding)) //Method Calling the list of all apps
+                    if(selectedApp == null){
+                        ListApps(modifier = Modifier.padding(innerPadding), onSelect = {selectedApp = it}) //Method Calling the list of all apps
+                    }
+                    else{
+                        BlockSettings(modifier = Modifier.padding(innerPadding), onSelect = {selectedApp = it}, packageName = selectedApp!!)
+                    }
                 }
             }
         }
@@ -43,55 +53,65 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BlockAppTheme {
-        Greeting("Android")
+fun BlockSettings(modifier: Modifier = Modifier,onSelect : (String?) -> Unit, packageName : String){ //Menu of settings for each individual app
+    val context = LocalContext.current
+    val app = context.packageManager.getApplicationInfo(packageName, 0) //Context and app
+    LazyColumn(modifier = modifier.fillMaxSize() //Lazycolumn for all of the text
+        .padding(16.dp)) {
+        item {
+            Text("Your chosen app: \n \n${app.loadLabel(context.packageManager)}" , fontSize = 30.sp) //App you chose
+            Text("\nBack to All apps", fontSize = 20.sp, modifier = Modifier.clickable{ //To go BACK to choosing menu
+                onSelect(null)
+            })
+        }
     }
 }
-
 @Composable
-fun ListApps(modifier: Modifier = Modifier){ //List all apps that are executable
+fun ListApps(modifier: Modifier = Modifier,
+             onSelect : (String) -> Unit){ //List all apps that are executable
     val context = LocalContext.current
-    var appNames by remember { mutableStateOf<List<String>>(emptyList()) } //initiating both context and the appnames list
+    var appNames by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) } //initiating both context and the appnames list
 
     LaunchedEffect(Unit) { //Runs once!
         val paquete = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_LAUNCHER) } //Intent: What apps CAN we see? (Launchables)
 
-        appNames = paquete.queryIntentActivities(intent, 0) //get the appnames through a stream
-            .map { name -> name.loadLabel(paquete).toString() }
-            .distinct()
-            .sortedBy { name -> name.lowercase() } //sort the apps by their names
+         appNames = paquete.queryIntentActivities(intent, 0) //get the appnames through a stream
+            .map {name -> val paket = name.activityInfo.packageName
+                val label = name.loadLabel(paquete).toString()
+                paket to label }
+            .distinctBy {it.first}
+            .sortedWith ( compareBy(String.CASE_INSENSITIVE_ORDER) { it.second }) //sort the apps by their names
     }
 
-    LazyColumn(modifier = modifier.padding(16.dp)){ //intro
+    LazyColumn(modifier = modifier.fillMaxSize()
+        .padding(16.dp)){ //Lazycolumns to display the apps
         item{
-            Text("Installed apps: ${appNames.size} :) ") //Not true, but rather installes apps that are launchable, does its job I guess
-            Text("These are your apps:")
+            Text("Installed apps: ${appNames.size} :) \n ") //Not true, but rather installes apps that are launchable, does its job
+            Text("These are your apps: \n",
+                fontSize = 30.sp)
+
         }
         if(appNames.isEmpty()){ //Wait while appnames might still be loading
             item{
                 Text("Loading...")
             }
-
         }
         else{
             //Display the app names
             items(appNames) { name ->
-                Text(name)
+                Text("${name.second} \n",
+                    fontSize = 20.sp,
+                    modifier = Modifier.clickable{
+                        onSelect(name.first)
+                    }
+                )
             }
         }
 
     }
 
 }
+
+
 
