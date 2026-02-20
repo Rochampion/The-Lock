@@ -11,9 +11,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,8 +29,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,6 +65,7 @@ class MainActivity : ComponentActivity() {
 fun BlockSettings(modifier: Modifier = Modifier,onSelect : (String?) -> Unit, packageName : String){ //Menu of settings for each individual app
     val context = LocalContext.current
     val app = context.packageManager.getApplicationInfo(packageName, 0) //Context and app
+    var textValue by remember { mutableStateOf("") }
     LazyColumn(modifier = modifier.fillMaxSize() //Lazycolumn for all of the text
         .padding(16.dp)) {
         item {
@@ -63,6 +73,28 @@ fun BlockSettings(modifier: Modifier = Modifier,onSelect : (String?) -> Unit, pa
             Text("\nBack to All apps", fontSize = 20.sp, modifier = Modifier.clickable{ //To go BACK to choosing menu
                 onSelect(null)
             })
+
+            Row(modifier = Modifier.fillMaxWidth()
+                .padding(16.dp),
+                verticalAlignment =Alignment.CenterVertically)
+            {
+                Text("Choose max limit per day:", fontSize = 20.sp)
+                Spacer(Modifier.width(12.dp))
+                OutlinedTextField(value = textValue, onValueChange ={ new->
+                    textValue = new.take(2)
+                    if(textValue.toInt()>24){
+                        textValue = "24"
+                    }
+
+                },
+                    modifier = Modifier.width(90.dp),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
+                    ),
+                    label = {Text("1-24")}
+                )
+            }
+
         }
     }
 }
