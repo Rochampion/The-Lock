@@ -74,22 +74,23 @@ fun BlockSettings(modifier: Modifier = Modifier,onSelect : (String?) -> Unit, pa
                 onSelect(null)
             })
 
-            Row(modifier = Modifier.fillMaxWidth()
+            Row(modifier = Modifier.fillMaxWidth() //Row for the hour limit per day, plan to do this for minutes too
                 .padding(16.dp),
                 verticalAlignment =Alignment.CenterVertically)
             {
                 Text("Choose max limit per day:", fontSize = 20.sp)
                 Spacer(Modifier.width(12.dp))
-                OutlinedTextField(value = textValue, onValueChange ={ new->
-                    textValue = new.take(2)
+                OutlinedTextField(value = textValue, onValueChange ={ new-> //Input Field
+                    textValue = new.take(2) //Arreglar Bug cuando quitas el ultimo digito: null check?
                     if(textValue.toInt()>24){
                         textValue = "24"
                     }
 
                 },
                     modifier = Modifier.width(90.dp),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
+                    singleLine = true, //no \n
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done //Ime: Input Methode Editor, Mobile Keyboard. Imeaction: What enter text is in the keyboard, no actual change
+                        //Arreglar: Despues de darle a Enter la caja sigue azul y en foco. Arreglar! (FocusManager)
                     ),
                     label = {Text("1-24")}
                 )
