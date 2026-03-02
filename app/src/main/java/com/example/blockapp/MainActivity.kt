@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -65,12 +66,13 @@ class MainActivity : ComponentActivity() {
 fun BlockSettings(modifier: Modifier = Modifier,onSelect : (String?) -> Unit, packageName : String){ //Menu of settings for each individual app
     val context = LocalContext.current
     val app = context.packageManager.getApplicationInfo(packageName, 0) //Context and app
-    var textValue by remember { mutableStateOf("") }
+    var hourValue by remember { mutableStateOf("") }
+    var minuteValue by remember { mutableStateOf("") }
     LazyColumn(modifier = modifier.fillMaxSize() //Lazycolumn for all of the text
         .padding(16.dp)) {
         item {
             Text("Your chosen app: \n \n${app.loadLabel(context.packageManager)}" , fontSize = 30.sp) //App you chose
-            Text("\nBack to All apps", fontSize = 20.sp, modifier = Modifier.clickable{ //To go BACK to choosing menu
+            Text("\n ← Back to All apps", fontSize = 20.sp, modifier = Modifier.clickable{ //To go BACK to choosing menu
                 onSelect(null)
             })
 
@@ -78,27 +80,28 @@ fun BlockSettings(modifier: Modifier = Modifier,onSelect : (String?) -> Unit, pa
                 ,
                 verticalAlignment =Alignment.CenterVertically)
             {
-                Text("Choose max hours per day:", fontSize = 20.sp)
+                Spacer(Modifier.height(150.dp))
+                Text("Max hours per day:", fontSize = 20.sp)
                 Spacer(Modifier.width(12.dp))
-                OutlinedTextField(value = textValue, onValueChange ={ new-> //Input Field
+                OutlinedTextField(value = hourValue, onValueChange ={ new-> //Input Field
                     if(new == ""){
-                        textValue = ""
+                        hourValue = ""
                     }
                     else {
-                        textValue = new.take(2)
-                        if(textValue.toInt()>24){
-                            textValue = "24"
+                        hourValue = new.take(2)
+                        if(hourValue.toInt()>24){
+                            hourValue = "24"
                         }
                     }
 
 
                 },
-                    modifier = Modifier.width(90.dp),
+                    modifier = Modifier.width(60.dp),
                     singleLine = true, //no \n
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done //Ime: Input Methode Editor, Mobile Keyboard. Imeaction: What enter text is in the keyboard, no actual change
                         //Arreglar: Despues de darle a Enter la caja sigue azul y en foco. Arreglar! (FocusManager)
                     ),
-                    label = {Text("1-24")}
+                    label = {Text("1-24" , fontSize = 12.sp)}
                 )
             }
 
@@ -106,22 +109,23 @@ fun BlockSettings(modifier: Modifier = Modifier,onSelect : (String?) -> Unit, pa
                 ,
                 verticalAlignment =Alignment.CenterVertically)
             {
-                Text("Choose max minutes per day:", fontSize = 20.sp)
+                Spacer(Modifier.height(100.dp))
+                Text("Max minutes per day:", fontSize = 20.sp)
                 Spacer(Modifier.width(12.dp))
-                OutlinedTextField(value = textValue, onValueChange ={ new-> //Input Field
+                OutlinedTextField(value = minuteValue, onValueChange ={ new-> //Input Field
                     if(new == ""){
-                        textValue = ""
+                        minuteValue = ""
                     }
                     else {
-                        textValue = new.take(2)
-                        if(textValue.toInt()>60){
-                            textValue = "60"
+                        minuteValue = new.take(2)
+                        if(minuteValue.toInt()>60){
+                            minuteValue = "60"
                         }
                     }
 
 
                 },
-                    modifier = Modifier.width(90.dp),
+                    modifier = Modifier.width(60.dp),
                     singleLine = true, //no \n
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done //Ime: Input Methode Editor, Mobile Keyboard. Imeaction: What enter text is in the keyboard, no actual change
                         //Arreglar: Despues de darle a Enter la caja sigue azul y en foco. Arreglar! (FocusManager)
