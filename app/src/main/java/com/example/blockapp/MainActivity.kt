@@ -74,17 +74,23 @@ fun BlockSettings(modifier: Modifier = Modifier,onSelect : (String?) -> Unit, pa
                 onSelect(null)
             })
 
-            Row(modifier = Modifier.fillMaxWidth() //Row for the hour limit per day, plan to do this for minutes too
-                .padding(16.dp),
+            Row(modifier = Modifier.fillMaxWidth() //Row for the hour limit per day if left blank, 0 hours are added
+                ,
                 verticalAlignment =Alignment.CenterVertically)
             {
-                Text("Choose max limit per day:", fontSize = 20.sp)
+                Text("Choose max hours per day:", fontSize = 20.sp)
                 Spacer(Modifier.width(12.dp))
                 OutlinedTextField(value = textValue, onValueChange ={ new-> //Input Field
-                    textValue = new.take(2) //Arreglar Bug cuando quitas el ultimo digito: null check?
-                    if(textValue.toInt()>24){
-                        textValue = "24"
+                    if(new == ""){
+                        textValue = ""
                     }
+                    else {
+                        textValue = new.take(2)
+                        if(textValue.toInt()>24){
+                            textValue = "24"
+                        }
+                    }
+
 
                 },
                     modifier = Modifier.width(90.dp),
@@ -93,6 +99,34 @@ fun BlockSettings(modifier: Modifier = Modifier,onSelect : (String?) -> Unit, pa
                         //Arreglar: Despues de darle a Enter la caja sigue azul y en foco. Arreglar! (FocusManager)
                     ),
                     label = {Text("1-24")}
+                )
+            }
+
+            Row(modifier = Modifier.fillMaxWidth() //Row for the minutes limit per day, added to the hours, if left blank, 0 hours are added
+                ,
+                verticalAlignment =Alignment.CenterVertically)
+            {
+                Text("Choose max minutes per day:", fontSize = 20.sp)
+                Spacer(Modifier.width(12.dp))
+                OutlinedTextField(value = textValue, onValueChange ={ new-> //Input Field
+                    if(new == ""){
+                        textValue = ""
+                    }
+                    else {
+                        textValue = new.take(2)
+                        if(textValue.toInt()>60){
+                            textValue = "60"
+                        }
+                    }
+
+
+                },
+                    modifier = Modifier.width(90.dp),
+                    singleLine = true, //no \n
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done //Ime: Input Methode Editor, Mobile Keyboard. Imeaction: What enter text is in the keyboard, no actual change
+                        //Arreglar: Despues de darle a Enter la caja sigue azul y en foco. Arreglar! (FocusManager)
+                    ),
+
                 )
             }
 
